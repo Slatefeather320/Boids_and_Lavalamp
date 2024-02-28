@@ -1,7 +1,7 @@
 import pygame, math
 width = 300; height = 600
 window = pygame.display.set_mode((width, height)) 
-pygame.display.set_caption('Boids')
+pygame.display.set_caption('Desktop Lavalamp')
 
 ##########################################
 #USER SETTINGS
