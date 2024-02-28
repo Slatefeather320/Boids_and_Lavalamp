@@ -16,41 +16,46 @@ instances = []
 def makeNewBoid(index, vel=pygame.Vector2(0,0), pos=pygame.Vector2(width/2,height/2)):
     instances.append(Boids(index, vel, pos))
 
-def allign(boid, influence=0.07,radius=80):
-    sumDir = pygame.Vector2()
+def allignSeperate(boid, allignInfluence=0.14,seperateInfluence=0.001,allignRadius=100,seperateRadius=40):
+    allignDir = pygame.Vector2()
+    seperateDir = pygame.Vector2()
     for otherBoid in instances:
-        if otherBoid != boid and (otherBoid.pos - boid.pos).magnitude() < radius:
-            sumDir += otherBoid.vel
-    if sumDir.magnitude() > 0:
-        boid.vel = ((sumDir.normalize()*influence) + boid.vel.normalize()).normalize()*boid.vel.magnitude()
+        if otherBoid != boid:
+            if (otherBoid.pos - boid.pos).magnitude() < allignRadius:
+                allignDir = allignDir + otherBoid.vel
+            if (otherBoid.pos - boid.pos).magnitude() < seperateRadius:
+                seperateDir = seperateDir + (boid.pos - otherBoid.pos)
+    if allignDir.magnitude() > 0:
+        boid.vel = ((allignDir.normalize()*allignInfluence)+ (seperateDir*seperateInfluence) + boid.vel.normalize()).normalize()*boid.vel.magnitude()
     
 
 def moveBoids():
+    hitbox = 35
     for boid in instances:
         boid.pos = boid.pos + boid.vel
-        if boid.pos.x > width-20:
+        if boid.pos.x > width-hitbox:
             boid.vel.x *= -1
-        if boid.pos.x < 20:
+        if boid.pos.x < hitbox:
             boid.vel.x *= -1
-        if boid.pos.y > height-20:
+        if boid.pos.y > height-hitbox:
             boid.vel.y *= -1
-        if boid.pos.y < 20:
+        if boid.pos.y < hitbox:
             boid.vel.y *= -1
-        allign(boid)
+        allignSeperate(boid)
 
 def renderBoids():
     for Boid in instances:
-        pygame.draw.circle(window, lava, Boid.pos, 50)
+        pygame.draw.circle(window, lava, Boid.pos, 40)
 
 def splat(x=100):
     for i in range(0,x):
         theta = 2 * math.pi * i/x
-        mag = 5
+        mag = 2.5
         xcomp = mag*math.sin(theta)
         ycomp = mag*math.cos(theta)
         makeNewBoid(i, pygame.Vector2(xcomp,ycomp))
 
-splat(250)
+splat(150)
 
 running = True
 while running:
